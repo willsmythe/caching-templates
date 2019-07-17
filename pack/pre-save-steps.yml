@@ -1,7 +1,6 @@
 steps:
-  - bash: |
-      echo "Path to tar: ${__CACHE_PATH}"
-      TAR_FILE="$CACHE_PATH/_cache.tar"
-      tar -cvf $TAR_FILE $__CACHE_PATH
-      echo "tar details: $(ls -la $TAR_FILE)"        
-    displayName: Cache pre-save step (tar contents)
+- bash: |
+    cd $CACHE_PACK_TOOLS_DIR
+    node tools.js pre-save
+  condition: variables.CACHE_PACK_TOOLS_DIR
+  displayName: 'Cache pack: pre-save'

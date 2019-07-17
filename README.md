@@ -13,13 +13,14 @@ variables:
   CACHE_KEY: mykey
 ```
 
-2. Update your `CacheBeta@0` step to reference these new variables:
+2. Update your `CacheBeta@0` step to reference these new variables and also sets `cacheHitVar` to `CACHE_RESTORED`:
 
 ```yaml
 - task: CacheBeta@0
   inputs:
     key: $(CACHE_KEY)
     path: $(CACHE_PATH)
+    cacheHitVar: CACHE_RESTORED
 ```
 
 3. Add the `caching-templates` repo as a pipeline resource so we can use its step templates:
@@ -36,15 +37,18 @@ resources:
 
 ```yaml
 steps:
+# init caching-templates utilities
+- template: pack/init-steps.yml@caching-templates
 
 # pre-restore step
 - template: pack/pre-restore-steps.yml@caching-templates
 
-# existing cache step
+# your cache step
 - task: CacheBeta@0
   inputs:
     key: $(CACHE_KEY)
     path: $(CACHE_PATH)
+    cacheHitVar: CACHE_RESTORED
 
 # post restore step
 - template: pack/post-restore-steps.yml@caching-templates
