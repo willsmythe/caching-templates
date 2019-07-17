@@ -1,0 +1,28 @@
+steps:
+  - bash: |
+      echo "Path to untar to: $__CACHE_PATH"
+      mkdir -p $__CACHE_PATH
+      TAR_FILE="$CACHE_PATH/_cache.tar"
+      tar -xvf $TAR_FILE -C $__CACHE_PATH
+      echo "files restored: $(ls -la $__CACHE_PATH)"
+    displayName: Cache post-restore step (untar contents)
+    condition: and(eq(variables.CACHE_RESTORED, 'true'), variables.__CACHE_PATH)
+
+  - bash: |
+      echo "Path to tar: ${__CACHE_PATH}"
+      TAR_FILE="$CACHE_PATH/_cache.tar"
+      tar -cvf $TAR_FILE $__CACHE_PATH
+      echo "tar details: $(ls -la $TAR_FILE)"        
+    displayName: Cache pre-save step (tar contents)
+
+# Run test-ci-partial
+ # - script: yarn run test-ci-partial
+ #   displayName: 'Run tests'
+
+  # Publish CI test results
+  # - task: PublishTestResults@2
+  #   inputs:
+  #     testResultsFiles: '**/reports/junit/*.xml'
+  #     testRunTitle: 'CI Tests $(Agent.OS)'
+  #   displayName: 'Publish test results'
+  #   condition: succeededOrFailed()

@@ -1,0 +1,7 @@
+steps:
+  - bash: |
+      echo "Path to tar: ${__CACHE_PATH}"
+      TAR_FILE="$CACHE_PATH/_cache.tar"
+      tar -cvf $TAR_FILE $__CACHE_PATH
+      echo "tar details: $(ls -la $TAR_FILE)"        
+    displayName: Cache pre-save step (tar contents)

@@ -1,0 +1,96 @@
+steps:
+  - bash: |
+      echo "$(npm install)"
+      echo "$(node test.js)"
+      echo "Path to cache: $CACHE_PATH"
+      echo "Saving as __CACHE_PATH"
+      echo "##vso[task.setvariable variable=__CACHE_PATH]$CACHE_PATH"
+      echo "Setting CACHE_PATH to a new temporary path"
+      export TMPDIR=$PIPELINE_WORKSPACE
+      export CACHE_PATH=$(mktemp -d)
+      echo "New CACHE_PATH: $CACHE_PATH"
+      echo "##vso[task.setvariable variable=CACHE_PATH]$CACHE_PATH"
+    displayName: Cache pack pre-restore (setup variables)
+    condition: eq(variables.CACHE_PACK, 'true')
+
+  - bash: printenv
+  #- script: |
+  #    set > a.txt
+  #    type a.txt
+  #  condition: eq(variables['Agent.OS'], 'Windows_NT')
+    displayName: Cache pack pre-restore (show variables)
+    condition: eq(variables.CACHE_PACK, 'true')
+
+  # - task: CacheBeta@0
+  #   inputs:
+  #     key: |
+  #       jest
+  #       node_modules_tar
+  #       $(Agent.OS)
+  #        $(Build.SourcesDirectory)/yarn.lock
+  #     path: $(CACHE_PATH)
+  #     cacheHitVar: CACHE_RESTORED
+  #   displayName: Cache node_modules
+  #   condition: ne(variables.__CACHE_PATH, '')
+
+  - bash: |
+      echo "Path to untar to: $__CACHE_PATH"
+      mkdir -p $__CACHE_PATH
+      TAR_FILE="$CACHE_PATH/_cache.tar"
+      tar -xvf $TAR_FILE -C $__CACHE_PATH
+      echo "files restored: $(ls -la $__CACHE_PATH)"
+    displayName: Cache post-restore step (untar contents)
+    condition: and(eq(variables.CACHE_RESTORED, 'true'), variables.__CACHE_PATH)
+ 
+  - task: CacheBeta@0
+    inputs:
+      key: |
+        jest
+        yarn
+        $(Agent.OS)
+        $(Build.SourcesDirectory)/yarn.lock
+      path: $(YARN_CACHE_FOLDER)
+    displayName: Cache Yarn
+    condition: ne(variables.YARN_CACHE_FOLDER, '')
+
+  # Ensure Node.js 10 is active
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '10.x'
+    displayName: 'Use Node.js 10'
+
+  # Ensure Python 2.7 is active
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '2.7'
+    displayName: 'Use Python 2.7'
+
+  # Run yarn to install dependencies and build
+  - script: node scripts/remove-postinstall
+    displayName: 'Remove postinstall script'
+
+  - script: yarn --no-progress --frozen-lockfile
+    displayName: 'Install dependencies'
+    condition: ne(variables.CACHE_RESTORED, 'true')
+
+  - script: node scripts/build
+    displayName: 'Build'
+
+  - bash: |
+      echo "Path to tar: ${__CACHE_PATH}"
+      TAR_FILE="$CACHE_PATH/_cache.tar"
+      tar -cvf $TAR_FILE $__CACHE_PATH
+      echo "tar details: $(ls -la $TAR_FILE)"        
+    displayName: Cache pre-save step (tar contents)
+
+# Run test-ci-partial
+ # - script: yarn run test-ci-partial
+ #   displayName: 'Run tests'
+
+  # Publish CI test results
+  # - task: PublishTestResults@2
+  #   inputs:
+  #     testResultsFiles: '**/reports/junit/*.xml'
+  #     testRunTitle: 'CI Tests $(Agent.OS)'
+  #   displayName: 'Publish test results'
+  #   condition: succeededOrFailed()

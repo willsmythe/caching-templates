@@ -1,0 +1,15 @@
+{
+  "name": "caching-templates",
+  "version": "1.0.0",
+  "description": "To cache a tar (on posix) or 7z for the cache path:",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://codesharing-SU0@dev.azure.com/codesharing-SU0/caching-tests/_git/caching-templates"
+  },
+  "author": "",
+  "license": "ISC"
+}
