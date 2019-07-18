@@ -96,8 +96,13 @@ function handleInit() {
 function handlePreRestore() {
     checkVariables(['PIPELINE_WORKSPACE', 'CACHE_PATH']);
 
-    console.log('Creating temporary directory for pack file under PIPELINE_WORKSPACE...');
-    const tempCachePath = fs.mkdtempSync(process.env.PIPELINE_WORKSPACE);
+    const tempPath = process.env.CACHE_PACK_TEMP || process.env.PIPELINE_WORKSPACE;
+
+    console.log(`Creating temporary directory for pack file under ${tempPath}`);
+    try {
+        fs.mkdirSync(tempPath, { recursive: true } );
+    } catch (e) {}
+    const tempCachePath = fs.mkdtempSync(tempPath);
     console.log(`  Pack directory: ${tempCachePath}`);
 
     console.log('Setting CACHE_PATH_ORIGINAL and CACHE_PATH environment variables');
