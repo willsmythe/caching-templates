@@ -14,21 +14,21 @@ const PACK_FORMATS = {
     zip: {
         extension: 'zip',
         commands: {
-            pack: '7z a $0 -mx=0 *',
+            pack: '7z a $0 -mx=1 *',
             unpack: '7z x $0 -aoa'
         }
     },
     '7z': {
         extension: '7z',
         commands: {
-            pack: '7z a $0 -mx=0 *',
+            pack: '7z a $0 -mx=1 *',
             unpack: '7z x $0 -aoa'
         }
     },
     '7z-split': {
         extension: '7z',
         commands: {
-            pack: '7z a $0 -mx=0 -v32m *',    // 7z a a.7z *.txt -v20m
+            pack: '7z a $0 -mx=1 -v32m *',    // 7z a a.7z *.txt -v20m
             unpack: '7z x $0 -t7z.split -aoa' // 7z x a.7z.001 -t7z.split
         },
         getActualPackFilePath: function(defaultPackFilePath) {
@@ -65,7 +65,7 @@ function getPackFilePath(returnActual = false) {
     }
 
     const defaultFilePath = path.join(process.env.CACHE_PATH, `_cache.${format.extension}`);
-    if (actual && format.getActualPackFilePath) {
+    if (returnActual && format.getActualPackFilePath) {
         return format.getActualPackFilePath(defaultFilePath)
     } else {
         return defaultFilePath;
@@ -139,6 +139,7 @@ function handlePostRestore() {
     }
     
     const packFilePath = getPackFilePath(true);
+    const packFormat = getPackFormat();
 
     console.log(`Checking for pack file: ${packFilePath}`); 
     if (!fs.existsSync(packFilePath)) {
