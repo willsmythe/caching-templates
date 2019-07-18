@@ -17,6 +17,13 @@ const PACK_FORMATS = {
             pack: '7z a $0 -mx=1 *',
             unpack: '7z x $0'
         }
+    },
+    '7z': {
+        extension: '7z',
+        commands: {
+            pack: '7z a $0 -mx=1 *',
+            unpack: '7z x $0'
+        }
     }
 }
 
