@@ -24,6 +24,17 @@ const PACK_FORMATS = {
             pack: '7z a $0 -mx=0 *',
             unpack: '7z x $0 -aoa'
         }
+    },
+    '7z-split': {
+        extension: '7z',
+        commands: {
+            pack: '7z a $0 -mx=0 -v32m *',    // 7z a a.7z *.txt -v20m
+            unpack: '7z x $0 -t7z.split -aoa' // 7z x a.7z.001 -t7z.split
+        },
+        getActualPackFilePath: function(defaultPackFilePath) {
+            // path to the actual/existing file on disk (which will be something like _cache.7z.001)
+            return `${defaultPackFilePath}.001`;
+        }
     }
 }
 
@@ -47,13 +58,18 @@ function getPackFormat() {
 }
 
 // Full path to the "pack" file (.tar or .zip)
-function getPackFilePath() {
+function getPackFilePath(returnActual = false) {
     const format = getPackFormat();
     if (!format) {
         throw new Error('Unknown pack format. Set CACHE_PACK_FORMAT to a supported format (or unset it).');
     }
 
-    return path.join(process.env.CACHE_PATH, `_cache.${format.extension}`);
+    const defaultFilePath = path.join(process.env.CACHE_PATH, `_cache.${format.extension}`);
+    if (actual && format.getActualPackFilePath) {
+        return format.getActualPackFilePath(defaultFilePath)
+    } else {
+        return defaultFilePath;
+    }
 }
 
 function checkVariables(requiredVariables, throwOnMissing = true) {
@@ -121,8 +137,8 @@ function handlePostRestore() {
         console.log('Cache was not restored. Not attempting to unpack.');
         return;
     }
-
-    const packFilePath = getPackFilePath();
+    
+    const packFilePath = getPackFilePath(true);
 
     console.log(`Checking for pack file: ${packFilePath}`); 
     if (!fs.existsSync(packFilePath)) {
@@ -138,7 +154,6 @@ function handlePostRestore() {
     } catch (e) {}
 
     // Unpack the pack file from the cache
-    const packFormat = getPackFormat();
     const cmd = packFormat.commands.unpack.replace('$0', packFilePath); // insert the path to the .tar/zip file
     console.log(`Unpacking into cache path with "${cmd}"`);
     child_process.execSync(cmd, { cwd: unpackTargetPath });
@@ -158,8 +173,9 @@ function handlePreSave() {
     child_process.execSync(cmd, { cwd: packSourcePath });
 
     // Verify the pack file was created
-    if (!fs.existsSync(packFilePath)) {
-        throw new Error(`Pack file not found: ${packFilePath}`);
+    const actualPackFilePath = getPackFilePath(true);
+    if (!fs.existsSync(actualPackFilePath)) {
+        throw new Error(`Pack file not found: ${actualPackFilePath}`);
     }
 }
 
