@@ -14,15 +14,15 @@ const PACK_FORMATS = {
     zip: {
         extension: 'zip',
         commands: {
-            pack: '7z a $0 -mx=1 *',
-            unpack: '7z x $0'
+            pack: '7z a $0 -mx=0 *',
+            unpack: '7z x $0 -aoa'
         }
     },
     '7z': {
         extension: '7z',
         commands: {
-            pack: '7z a $0 -mx=1 *',
-            unpack: '7z x $0'
+            pack: '7z a $0 -mx=0 *',
+            unpack: '7z x $0 -aoa'
         }
     }
 }
