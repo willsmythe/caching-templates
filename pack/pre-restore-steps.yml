@@ -5,7 +5,10 @@ steps:
     cd $c/pack
     npm install
     node tools.js init
-  condition: and(eq(variables.CACHE_PACK, 'true'), not(variables.CACHE_PACK_TOOLS_INIT))
+  # logically 'init' should not run when CACHE_PACK is not 'true',
+  # but for better apples-to-apples comparisons with runs not using pack, we'll leave it in since it can take 15+ seconds
+  # correct condition: and(eq(variables.CACHE_PACK, 'true'), not(variables.CACHE_PACK_TOOLS_INIT))
+  condition: not(variables.CACHE_PACK_TOOLS_INIT)
   displayName: 'Cache pack: init tools'
 
 - bash: |
