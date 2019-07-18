@@ -1,17 +1,17 @@
 steps:
 - bash: |
     export c=$AGENT_TEMPDIRECTORY/caching-templates
-    git clone https://dev.azure.com/codesharing-SU0/caching-tests/_git/caching-templates $c
+    git clone https://github.com/willsmythe/caching-templates.git $c
     cd $c/pack
     npm install
     node tools.js init
-  condition: and(eq(variables.CACHE_PACK, 'true'), not(variables.CACHE_PACK_TOOLS_DIR))
+  condition: and(eq(variables.CACHE_PACK, 'true'), not(variables.CACHE_PACK_TOOLS_INIT))
   displayName: 'Cache pack: init tools'
 
 - bash: |
     cd $CACHE_PACK_TOOLS_DIR
     node tools.js pre-restore
-  condition: variables.CACHE_PACK_TOOLS_DIR
+  condition: and(eq(variables.CACHE_PACK, 'true'), variables.CACHE_PACK_TOOLS_DIR)
   displayName: 'Cache pack: pre-restore'
 
 - bash: printenv

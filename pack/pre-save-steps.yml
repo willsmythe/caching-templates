@@ -2,5 +2,5 @@ steps:
 - bash: |
     cd $CACHE_PACK_TOOLS_DIR
     node tools.js pre-save
-  condition: variables.CACHE_PACK_TOOLS_DIR
+  condition: and(eq(variables.CACHE_PACK, 'true'), variables.CACHE_PACK_TOOLS_DIR)
   displayName: 'Cache pack: pre-save'
