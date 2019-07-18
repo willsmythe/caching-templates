@@ -114,7 +114,7 @@ function handlePostRestore() {
 
     console.log(`Checking for pack file: ${packFilePath}`); 
     if (!fs.existsSync(packFilePath)) {
-        throw new Error(`Attempting to restore, but cannot find pack file: ${packFilePath}`);
+        throw new Error(`Attempting to restore, but cannot find pack file. Did you forget to update CACHE_KEY to something new?: ${packFilePath}`);
     }
     
     const unpackTargetPath = process.env.CACHE_PATH_ORIGINAL;
