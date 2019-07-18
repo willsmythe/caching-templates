@@ -1,0 +1,43 @@
+resources:
+  repositories:
+  - repository: caching-templates
+    type: github
+    name: willsmythe/caching-templates
+    endpoint: willsmythe
+
+jobs:
+  - job:
+    strategy:
+      matrix:
+        linux:    
+          VM_IMAGE: ubuntu-16.04
+        windows:
+          VM_IMAGE: vs2017-win2016
+        macos:
+          VM_IMAGE: macos-10.13
+    pool:
+      vmImage: $(VM_IMAGE)
+    variables:
+      CACHE_PACK: true
+      CACHE_PATH: $(Build.SourcesDirectory)/node_modules
+      CACHE_KEY: |
+        v1
+        $(Agent.OS)
+        $(Build.SourcesDirectory)/package-lock.json
+    steps:
+    - template: pack/pre-restore-steps.yml@caching-templates
+
+    - task: CacheBeta@0
+      inputs:
+        key: $(CACHE_KEY)
+        path: $(CACHE_PATH)
+        cacheHitVar: CACHE_RESTORED
+      displayName: Cache node_modules    
+
+    - template: pack/post-restore-steps.yml@caching-templates
+
+    - script: yarn --no-progress --frozen-lockfile
+      displayName: 'Install dependencies'
+      condition: ne(variables.CACHE_RESTORED, 'true')
+
+    - template: pack/pre-save-steps.yml@caching-templates
