@@ -13,9 +13,16 @@ These steps simplify the process of packing cached files into a single "tar" fil
 2. If your pipeline runs on a Microsoft-hosted agent, no additional configuation or software is required.
 
 3. If your pipeline runs on a self-hosted agent, make sure the following software is installed:
+   * Git
    * Node.js 8.x or higher
    * `tar` in your $PATH (for Linux or macOS)
    * `7z` in your %PATH% (for Windows)
+
+### Limitations
+
+1. Currently only works with jobs that have a single `CacheBeta@0` step
+
+2. For container jobs, the same software required for self-hosted agents (see above) is required in the container
 
 ### Step 1: import steps into your pipeline
 
