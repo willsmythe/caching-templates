@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/willsmythe/caching-templates/_apis/build/status/willsmythe.caching-templates?branchName=master)](https://dev.azure.com/willsmythe/caching-templates/_build/latest?definitionId=54&branchName=master)
+
 # Caching templates
 
 This repo provides Azure Pipelines templates and other tools related to [pipeline caching](https://aka.ms/pipeline-caching-docs).
