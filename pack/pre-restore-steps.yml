@@ -1,5 +1,6 @@
 steps:
 - bash: |
+    set -x
     export c=$AGENT_TEMPDIRECTORY/caching-templates
     git clone https://github.com/willsmythe/caching-templates.git -b ${CACHE_PACK_TOOLS_BRANCH:-master} $c
     cd $c/pack
