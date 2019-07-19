@@ -1,6 +1,6 @@
 steps:
 - bash: |
-    set -x
+    set -e
     export c=$AGENT_TEMPDIRECTORY/caching-templates
     git clone https://github.com/willsmythe/caching-templates.git -b ${CACHE_PACK_TOOLS_BRANCH:-master} $c
     cd $c/pack
@@ -12,7 +12,7 @@ steps:
   condition: not(variables.CACHE_PACK_TOOLS_INIT)
   displayName: 'Cache pack: init tools'
 
-- bash: |
+- bash: |    
     cd $CACHE_PACK_TOOLS_DIR
     node tools.js pre-restore
   condition: and(eq(variables.CACHE_PACK, 'true'), variables.CACHE_PACK_TOOLS_DIR)

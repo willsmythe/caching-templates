@@ -1,5 +1,6 @@
 steps:
 - bash: |
+    set -e
     cd $CACHE_PACK_TOOLS_DIR
     node tools.js post-restore
   condition: and(eq(variables.CACHE_PACK, 'true'), eq(variables.CACHE_RESTORED, 'true'))
