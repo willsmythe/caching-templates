@@ -42,5 +42,6 @@ jobs:
 
     - bash: yarn prettier --version
       displayName: Verify prettier is runnable
+      workingDirectory:  $(Build.SourcesDirectory)/pack/samples
 
     - template: pack/pre-save-steps.yml@caching-templates
