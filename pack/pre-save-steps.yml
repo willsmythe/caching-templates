@@ -1,4 +1,4 @@
 steps:
-- bash: cd $(CACHE_PACK_TOOLS_DIR) && node tools.js pre-save
+- script: cd $(CACHE_PACK_TOOLS_DIR) && node tools.js pre-save
   condition: and(eq(variables.CACHE_PACK, 'true'), ne(variables.CACHE_RESTORED, 'true'))
   displayName: 'Cache pack: pre-save'
