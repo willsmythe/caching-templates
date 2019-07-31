@@ -3,13 +3,34 @@ const fs = require('fs');
 const os = require('os');
 const child_process = require('child_process');
 
+function convertToPosixStylePath(p) {
+    if (os.platform() === 'win32' && p[1] == ':') {
+        return '/' + p.substring(0, 1).toLowerCase() + p.substring(1).replace(/\\/g, '/').replace(':', '');
+    } else {
+        return p;
+    }
+}
+
+// "c" is something like PACK_FORMATS.tar.commands.pack
+function getCommand(cmd, packFile) {
+    if (cmd instanceof Function) {
+        return cmd(packFile); // call custom function that returns the command
+    } else {
+        return cmd.replace('$0', packFile); // insert the path to the .tar/zip file
+    }
+}
+
 const PACK_FORMATS = {
     tar: {
         extension: 'tar',
         commands: {
-            pack: 'tar -cvpf $0 .',
-            unpack: 'tar -xvf $0'
-        }        
+            pack: (packFile) => {
+                return `tar -cvpf ${convertToPosixStylePath(packFile)} .`;
+            },
+            unpack: (packFile) => {
+                return `tar -xvf ${convertToPosixStylePath(packFile)}`;
+            }
+        }    
     },
     zip: {
         extension: 'zip',
@@ -58,7 +79,7 @@ function getPackFormat() {
 }
 
 // Full path to the "pack" file (.tar or .zip)
-function getPackFilePath(returnActual = false) {
+function getPackFile(returnActual = false) {
     const format = getPackFormat();
     if (!format) {
         throw new Error('Unknown pack format. Set CACHE_PACK_FORMAT to a supported format (or unset it).');
@@ -138,12 +159,12 @@ function handlePostRestore() {
         return;
     }
     
-    const packFilePath = getPackFilePath(true);
+    const packFile = getPackFile(true);
     const packFormat = getPackFormat();
 
-    console.log(`Checking for pack file: ${packFilePath}`); 
-    if (!fs.existsSync(packFilePath)) {
-        throw new Error(`Attempting to restore, but cannot find pack file. Did you forget to update CACHE_KEY to something new?: ${packFilePath}`);
+    console.log(`Checking for pack file: ${packFile}`); 
+    if (!fs.existsSync(packFile)) {
+        throw new Error(`Attempting to restore, but cannot find pack file. Did you forget to update CACHE_KEY to something new?: ${packFile}`);
     }
     
     const unpackTargetPath = process.env.CACHE_PATH_ORIGINAL;
@@ -155,7 +176,7 @@ function handlePostRestore() {
     } catch (e) {}
 
     // Unpack the pack file from the cache
-    const cmd = packFormat.commands.unpack.replace('$0', packFilePath); // insert the path to the .tar/zip file
+    const cmd = getCommmand(packFormat.commands.unpack, packFile);
     console.log(`Unpacking into cache path with "${cmd}"`);
     child_process.execSync(cmd, { cwd: unpackTargetPath });
 }
@@ -166,22 +187,15 @@ function handlePreSave() {
 
     // Create a pack file for the cached contents
     const packFormat = getPackFormat();
-    let packFilePath = getPackFilePath();
-    // HACK to convert file path passed to "tar" on Windows
-    if (os.platform() === 'win32' &&
-        packFormat.commands.pack.startsWith('tar') &&
-        packFilePath[1] == ':') {
-        packFilePath = '/' + packFilePath.substring(0,1).toLowerCase() + packFilePath.substring(1).replace(/\\/g, '/').replace(':', '');
-    }
-
+    const packFile = getPackFile();
     const packSourcePath = process.env.CACHE_PATH_ORIGINAL;
-    const cmd = packFormat.commands.pack.replace('$0', packFilePath); // insert the path to the .tar/zip file
+    const cmd = getCommand(packFormat.commands.pack, packFile);
 
     console.log(`Creating pack file with "${cmd}"`);
     child_process.execSync(cmd, { cwd: packSourcePath });
 
     // Verify the pack file was created
-    const actualPackFilePath = getPackFilePath(true);
+    const actualPackFilePath = getPackFile(true);
     if (!fs.existsSync(actualPackFilePath)) {
         throw new Error(`Pack file not found: ${actualPackFilePath}`);
     }
