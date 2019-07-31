@@ -165,8 +165,15 @@ function handlePreSave() {
     checkVariables(['CACHE_PATH', 'CACHE_PATH_ORIGINAL']);
 
     // Create a pack file for the cached contents
-    const packFilePath = getPackFilePath();
     const packFormat = getPackFormat();
+    let packFilePath = getPackFilePath();
+    // HACK to convert file path passed to "tar" on Windows
+    if (os.platform() === 'win32' &&
+        packFormat.commands.pack.startsWith('tar') &&
+        packFilePath[1] == ':') {
+        packFilePath = '/' + packFilePath.substring(0,1).toLowerCase() + packFilePath.substring(1).replace(/\\/g, '/').replace(':', '');
+    }
+
     const packSourcePath = process.env.CACHE_PATH_ORIGINAL;
     const cmd = packFormat.commands.pack.replace('$0', packFilePath); // insert the path to the .tar/zip file
 
