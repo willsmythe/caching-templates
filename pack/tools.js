@@ -176,7 +176,7 @@ function handlePostRestore() {
     } catch (e) {}
 
     // Unpack the pack file from the cache
-    const cmd = getCommmand(packFormat.commands.unpack, packFile);
+    const cmd = getCommand(packFormat.commands.unpack, packFile);
     console.log(`Unpacking into cache path with "${cmd}"`);
     child_process.execSync(cmd, { cwd: unpackTargetPath });
 }
