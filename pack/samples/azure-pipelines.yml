@@ -21,7 +21,7 @@ jobs:
       CACHE_PACK: true
       CACHE_PATH: $(Build.SourcesDirectory)/pack/samples/node_modules
       CACHE_KEY: |
-        v1
+        v2
         $(Agent.OS)
         $(Build.SourcesDirectory)/pack/samples/yarn.lock
     steps:
