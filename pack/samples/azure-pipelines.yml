@@ -19,11 +19,11 @@ jobs:
       vmImage: $(VM_IMAGE)
     variables:
       CACHE_PACK: true
-      CACHE_PATH: $(Build.SourcesDirectory)/node_modules
+      CACHE_PATH: $(Build.SourcesDirectory)/pack/samples/node_modules
       CACHE_KEY: |
-        v1
+        v2
         $(Agent.OS)
-        $(Build.SourcesDirectory)/package-lock.json
+        $(Build.SourcesDirectory)/pack/samples/yarn.lock
     steps:
     - template: pack/pre-restore-steps.yml@caching-templates
 
@@ -39,5 +39,10 @@ jobs:
     - script: yarn --no-progress --frozen-lockfile
       displayName: 'Install dependencies'
       condition: ne(variables.CACHE_RESTORED, 'true')
+      workingDirectory:  $(Build.SourcesDirectory)/pack/samples
+
+    - bash: yarn prettier --version
+      displayName: Verify prettier is runnable
+      workingDirectory:  $(Build.SourcesDirectory)/pack/samples
 
     - template: pack/pre-save-steps.yml@caching-templates
