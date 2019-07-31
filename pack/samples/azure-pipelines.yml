@@ -39,6 +39,7 @@ jobs:
     - script: yarn --no-progress --frozen-lockfile
       displayName: 'Install dependencies'
       condition: ne(variables.CACHE_RESTORED, 'true')
+      workingDirectory:  $(Build.SourcesDirectory)/pack/samples
 
     - bash: yarn prettier --version
       displayName: Verify prettier is runnable
