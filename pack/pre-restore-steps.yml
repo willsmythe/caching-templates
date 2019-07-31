@@ -12,10 +12,6 @@ steps:
   condition: not(variables.CACHE_PACK_TOOLS_INIT)
   displayName: 'Cache pack: init tools'
 
-- bash: |    
-    cd $CACHE_PACK_TOOLS_DIR
-    node tools.js pre-restore
+- script: cd $(CACHE_PACK_TOOLS_DIR) && node tools.js pre-restore
   condition: and(eq(variables.CACHE_PACK, 'true'), variables.CACHE_PACK_TOOLS_DIR)
   displayName: 'Cache pack: pre-restore'
-
-#- bash: printenv
