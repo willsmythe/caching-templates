@@ -152,7 +152,8 @@ function handlePreRestore() {
 function handlePostRestore() {
     checkVariables(['CACHE_PATH', 'CACHE_PATH_ORIGINAL']);
 
-    const cacheRestored = process.env.CACHE_RESTORED == 'true';
+    const cacheRestored = process.env.CACHE_RESTORED == 'true'
+                       || process.env.CACHE_RESTORED == 'inexact';
 
     if (!cacheRestored) {    
         console.log('Cache was not restored. Not attempting to unpack.');
