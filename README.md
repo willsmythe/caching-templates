@@ -1,5 +1,7 @@
 [![Build Status](https://dev.azure.com/willsmythe/caching-templates/_apis/build/status/willsmythe.caching-templates?branchName=master)](https://dev.azure.com/willsmythe/caching-templates/_build/latest?definitionId=54&branchName=master)
 
+
+
 # Caching templates
 
 This repo provides Azure Pipelines templates and other tools related to [pipeline caching](https://aka.ms/pipeline-caching-docs).
@@ -118,7 +120,5 @@ steps:
 ```
 
 ### Step 5: run your pipeline
-
+1
 If you run into a problem and need help, open an issue at [willsmythe/caching-templates](https://github.com/willsmythe/caching-templates/issues).
-
-12
