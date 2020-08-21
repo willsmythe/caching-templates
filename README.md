@@ -120,5 +120,5 @@ steps:
 ```
 
 ### Step 5: run your pipeline
-
+1
 If you run into a problem and need help, open an issue at [willsmythe/caching-templates](https://github.com/willsmythe/caching-templates/issues).
