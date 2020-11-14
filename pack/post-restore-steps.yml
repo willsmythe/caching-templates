@@ -1,4 +1,4 @@
 steps:
 - script: cd $(CACHE_PACK_TOOLS_DIR) && node tools.js post-restore
-  condition: and(eq(variables.CACHE_PACK, 'true'), eq(variables.CACHE_RESTORED, 'true'))
+  condition: and(eq(variables.CACHE_PACK, 'true'), or(eq(variables.CACHE_RESTORED, 'true'), eq(variables.CACHE_RESTORED, 'inexact')))
   displayName: 'Cache pack: post-restore'
